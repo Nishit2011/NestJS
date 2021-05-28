@@ -1,5 +1,6 @@
-import { Delete, Get, Patch, UsePipes } from '@nestjs/common';
+import { Delete, Get, Patch, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
+
 import { AuthCredentialsDto } from 'src/tasks/dto/auth-creds.dto';
 import { AuthService } from './auth.service';
 import { Users } from './user.entity';
@@ -33,9 +34,4 @@ export class AuthController {
   signIn(@Body() authUserDto: AuthCredentialsDto): Promise<Users> {
     return this.authService.signIn(authUserDto);
   }
-
-  //   @Patch(':id')
-  //   updateUserById(userId: string): Promise<Users> {
-  //     return this.authService.updateUserById(userId);
-  //   }
 }
