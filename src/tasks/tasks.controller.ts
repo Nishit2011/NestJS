@@ -1,6 +1,16 @@
-import { Delete, Param, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Delete,
+  Param,
+  Patch,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Body } from '@nestjs/common';
 import { Controller, Get, Post } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { Users } from 'src/auth/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskStatus } from './tasks-status.enum';
 import { Task } from './tasks.entity';
@@ -8,6 +18,7 @@ import { Task } from './tasks.entity';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
   constructor(private tasksService: TasksService) {}
   @Get()
@@ -23,14 +34,19 @@ export class TasksController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-    return this.tasksService.createTask(createTaskDto);
+  createTask(
+    @Body() createTaskDto: CreateTaskDto,
+    @GetUser()
+    user: Users,
+  ): Promise<Task> {
+    return this.tasksService.createTask(createTaskDto, user);
   }
 
   @Delete(':id')
-  deleteTaskById(@Param() params): Promise<void> {
+  deleteTaskById(@Param() params, @GetUser() user: Users): Promise<void> {
     const taskId = params.id;
-    return this.tasksService.deleteTaskById(taskId);
+    // console.log(user);
+    return this.tasksService.deleteTaskById(taskId, user);
   }
 
   @Patch(':id')
